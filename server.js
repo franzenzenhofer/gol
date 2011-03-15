@@ -16,10 +16,10 @@ for(var i = 0; i<process.ARGV.length; i++)
   console.log(process.ARGV[i]);
   if(process.ARGV[i]=='start'){ start = true; }
   if(typeof process.ARGV[i] == "number"){ wait = process.ARGV[i]; }
-  if(start) { gol.start(false,false,wait); }
+  //if(start) { gol.start(false,false,wait); }
 }
 
-
+gol.start(false,false,wait);
 
 app.get('/', function(req, res) {
     fs.readFile('./index.html', 'utf-8', function (err, data) {
