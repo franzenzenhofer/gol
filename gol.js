@@ -15,8 +15,10 @@ var truly = 1;
 var wait = 150; //irelevant // only gol server counts currently
 /*var x = 100;
 var y = 60;*/
-var x = 100;
-var y = 60;
+//var x = 100;
+//var y = 60;
+var x = 10;
+var y = 10;
 var worldsize = x * y;
 var defaultAliveColor = '00FF00';
 
@@ -87,10 +89,10 @@ var getAWorld = function(x,y,seed)
 
 //var world = getAWorld(x,y,worldsize/5);
 var world = getAWorld(x,y,{
-'FF0000':worldsize/10,
-'0000FF':worldsize/10,
-'00FF00':worldsize/10,
-'FFFF00':worldsize/10
+'FF0000':worldsize/5,
+'0000FF':worldsize/5,
+'00FF00':worldsize/5,
+'FFFF00':worldsize/5
 });
 //console.log('GOL');
 
