@@ -9,6 +9,8 @@
     "node": "*"
   },
   "dependencies": {
-    "express": "*"
+    "express": "*",
+    "socket.io": "*",
+    "fs": "*"
   }
 }
