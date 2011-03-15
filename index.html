@@ -85,7 +85,7 @@ var call = function call ()
 };
 //call();
 //var socket = new io.Socket('127.0.0.1', {port:3000}); 
-var socket = new io.Socket('gameoflife.duostack.net/', {port:80}); 
+var socket = new io.Socket('gameoflife.duostack.net', {port:80}); 
 socket.on('connect', function(){ 
   socket.send('hi!'); 
   //alert('connect');
