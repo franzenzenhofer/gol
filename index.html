@@ -1,0 +1,112 @@
+<html>
+<head>
+<style>pre {
+  font-family:     "Courier New",
+                    Courier,
+                    monospace;
+}
+     </style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script> 
+<script>
+
+
+var updateGol = function(d){
+  var s='';
+  var y=d.y;
+  var x=d.x;
+  timeout = d.t;
+  var world = d.w;
+  for(var i = 0; i<y; i++)
+  {
+    for(var j = 0; j<x; j++)
+    {
+      wni=(i*x)+j;
+      if(world[wni])
+      {
+        s=s+('☺');
+      }
+      else
+      {
+        s=s+('.');
+      }
+    }
+    s=s+"\n";
+  }
+  $('#board').text(s);
+}
+
+var updateGolCanvas = function(d, canvas)
+{
+  //canvas.width = canvas.width;
+ //alert(d.w)
+  var y=d.y;
+  var x=d.x;
+  timeout = d.t;
+  var world = d.w;
+  ctx=canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  //ctx.fillStyle = "#"+;
+  
+  var cell = function(cx,cy,color,ctx){
+    ctx.fillStyle = "#"+color;
+    //alert(color);
+    ctx.beginPath();
+    ctx.arc(cx, cy, 8, 0, Math.PI*2, true); 
+    ctx.closePath();
+    ctx.fill();
+  }
+  
+  for(var i = 0; i<y; i++)
+  {
+    for(var j = 0; j<x; j++)
+    {
+      wni=(i*x)+j;
+      if(world[wni].alive)
+      {
+        cell((j+1)*10,(i+1)*10,world[wni].color,ctx);
+      }
+      else
+      {
+        //s=s+('.');
+      }
+    }
+    //s=s+"\n";
+  }
+  
+  
+  
+}
+
+var call = function call ()
+{ 
+  var timeout;
+  $.getJSON('http://127.0.0.1:3000/jsonp?callback=?', updateGol(data)).complete(function() {  window.setTimeout(function(){call();},timeout); });
+};
+//call();
+var socket = new io.Socket('127.0.0.1', {port:3000}); 
+socket.on('connect', function(){ 
+  socket.send('hi!'); 
+  //alert('connect');
+});
+socket.on('message', function(data){ 
+ //alert('message');
+  //alert(data);
+ // updateGol(data);
+  updateGolCanvas(data, document.getElementById('world'));
+});
+socket.on('disconnect', function(){
+//alert('disconnect');
+}); 
+socket.connect();
+
+</script>
+
+</head>
+<body>
+<pre id="board" >
+</pre>
+<center><canvas id="world" width="1010px" height="610px" style="border:1px solid black;" ></canvas></center>
+
+</body>
+</html>
