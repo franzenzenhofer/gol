@@ -6,6 +6,7 @@ var app = express.createServer();
 var socket = io.listen(app);
 var gol = require('./gol.js');
 var fs = require('fs');
+var util = require('util');
 
 
 app.enable('jsonp callback');
@@ -32,6 +33,10 @@ app.get('/start', function(req, res) {
     gol.start();
 });
 
+app.get('/debug', function(req, res) {
+           console.log(util.inspect(gol.getStreamlinedWorld(), true, null));
+});
+
 app.get('/jsonp', function(req, res) {
     res.send(gol.world);
 });
@@ -47,7 +52,8 @@ socket.on('connection', function(client)
     
     if(!activeBroadCast)
     {
-     activeBroadCast=setInterval(function(){client.broadcast(gol.world);console.log('interval');}, wait);
+     //activeBroadCast=setInterval(function(){client.broadcast(gol.world);console.log('interval');}, wait);
+     activeBroadCast=setInterval(function(){client.broadcast(gol.getStreamlinedWorld());console.log('interval');}, wait);
     }
 
 });

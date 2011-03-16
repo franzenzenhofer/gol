@@ -13,12 +13,12 @@ var falsy = 0;
 var truly = 1;
 
 var wait = 150; //irelevant // only gol server counts currently
-/*var x = 100;
-var y = 60;*/
+var x = 100;
+var y = 60;
 //var x = 100;
 //var y = 60;
-var x = 10;
-var y = 10;
+//var x = 10;
+//var y = 10;
 var worldsize = x * y;
 var defaultAliveColor = '00FF00';
 
@@ -256,5 +256,36 @@ var start = function(_w,_c,_t)
 
 exports.start = start;
 exports.world = { 'x':x, 'y':y, 'g':generation, 't':wait, 'w':publicWorld };
+exports.getStreamlinedWorld = function()
+{
+  var streamlinedWorld=[];
+  var colorO = {};
+  for(var i = 0; i < publicWorld.length; i ++)
+  {
+    if(!publicWorld[i].alive)
+    {
+      streamlinedWorld[i]=0;
+    }
+    else
+    {
+      if(colorO[publicWorld[i].color])
+      {
+        streamlinedWorld[i]=colorO[publicWorld[i].color];
+      }
+      else
+      {
+        var j = 1;
+        for(var color in colorO)
+        {
+          j++;
+        }
+        colorO[publicWorld[i].color]=j;
+        streamlinedWorld[i]=j;
+      }
+    }
+  }
+  
+  return { 'x':x, 'y':y, 'g':generation, 't':wait, 'w':streamlinedWorld };
+}
 
 //world = wayOfLife(world, wayOfLife, 500);
