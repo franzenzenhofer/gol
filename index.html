@@ -45,7 +45,7 @@ var updateGolCanvas = function(d, canvas)
   var x=d.x;
   timeout = d.t;
   var world = d.w;
-  alert(world);
+  //alert(world);
   ctx=canvas.getContext("2d");
   ctx.clearRect(0,0,canvas.width,canvas.height);
   //ctx.fillStyle = "#"+;
@@ -90,7 +90,7 @@ var call = function call ()
 var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket']}); 
 socket.on('connect', function(){ 
   socket.send('hi!'); 
-  alert('connect');
+  //alert('connect');
 });
 socket.on('message', function(data){ 
  //alert('message');
@@ -99,7 +99,7 @@ socket.on('message', function(data){
   updateGolCanvas(data, document.getElementById('world'));
 });
 socket.on('disconnect', function(){
-alert('disconnect');
+//alert('disconnect');
 }); 
 socket.connect();
 
