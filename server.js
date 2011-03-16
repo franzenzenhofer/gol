@@ -3,7 +3,7 @@
 var express = require('express');
 var io = require('socket.io');
 var app = express.createServer();
-var socket = io.listen(app, {'transports':['websocket']});
+var socket = io.listen(app, {'transports':['websocket'], 'port':9980});
 var gol = require('./gol.js');
 var fs = require('fs');
 var util = require('util');
