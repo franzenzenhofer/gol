@@ -24,6 +24,7 @@ var defaultAliveColor = '00FF00';
 
 //generation counter
 var generation = 0;
+var colorO = {};
 
 
 var createCell = function(_alive, _color){
@@ -256,10 +257,11 @@ var start = function(_w,_c,_t)
 
 exports.start = start;
 exports.world = { 'x':x, 'y':y, 'g':generation, 't':wait, 'w':publicWorld };
+
 exports.getStreamlinedWorld = function()
 {
   var streamlinedWorld=[];
-  var colorO = {};
+  
   for(var i = 0; i < publicWorld.length; i ++)
   {
     if(!publicWorld[i].alive)
