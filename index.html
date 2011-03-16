@@ -10,49 +10,18 @@
 <script src="http://cdn.socket.io/stable/socket.io.js"></script> 
 <script>
 
-var colA= ['FF0000','0000FF','00FF00','FFFF00'];
-var updateGol = function(d){
-  var s='';
-  var y=d.y;
-  var x=d.x;
-  timeout = d.t;
-  var world = d.w;
- 
-  for(var i = 0; i<y; i++)
-  {
-    for(var j = 0; j<x; j++)
-    {
-      wni=(i*x)+j;
-      if(world[wni])
-      {
-        s=s+('☺');
-      }
-      else
-      {
-        s=s+('.');
-      }
-    }
-    s=s+"\n";
-  }
-  $('#board').text(s);
-}
-
+var colA= ['000000','FF0000','00FF00','0000FF', 'FFFF00', '00FFFF', 'FF00FF', 'FF6600'];
 var updateGolCanvas = function(d, canvas)
 {
-  //canvas.width = canvas.width;
- //alert(d.w)
   var y=d.y;
   var x=d.x;
   timeout = d.t;
   var world = d.w;
-  //alert(world);
   ctx=canvas.getContext("2d");
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  //ctx.fillStyle = "#"+;
   
   var cell = function(cx,cy,nrid,ctx){
     ctx.fillStyle = "#"+colA[nrid-1];
-    //alert(color);
     ctx.beginPath();
     ctx.arc(cx, cy, 8, 0, Math.PI*2, true); 
     ctx.closePath();
@@ -68,16 +37,9 @@ var updateGolCanvas = function(d, canvas)
       {
         cell((j+1)*10,(i+1)*10,world[wni],ctx);
       }
-      else
-      {
-        //s=s+('.');
-      }
+
     }
-    //s=s+"\n";
   }
-  
-  
-  
 }
 
 var call = function call ()
@@ -85,22 +47,16 @@ var call = function call ()
   var timeout;
   $.getJSON('http://127.0.0.1:3000/jsonp?callback=?', updateGol(data)).complete(function() {  window.setTimeout(function(){call();},timeout); });
 };
-//call();
-//var socket = new io.Socket('127.0.0.1', {port:3000}); 
 //var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket', 'flashsocket','xhr-multipart', 'xhr-polling', 'jsonp-polling', 'htmlfile' ]}); 
-var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket' ]}); 
+//var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket' ]}); 
+var socket = new io.Socket('127.0.0.1', {port:3000, 'transports':['websocket' ]}); 
 socket.on('connect', function(){ 
   socket.send('hi!'); 
-  //alert('connect');
 });
 socket.on('message', function(data){ 
- //alert('message');
-  //alert(data);
- // updateGol(data);
   updateGolCanvas(data, document.getElementById('world'));
 });
 socket.on('disconnect', function(){
-//alert('disconnect');
 }); 
 socket.connect();
 

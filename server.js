@@ -1,4 +1,3 @@
-//gol2.js
 
 var express = require('express');
 var io = require('socket.io');
@@ -29,6 +28,8 @@ app.get('/', function(req, res) {
       res.send(data);
     });
 });
+
+
 
 app.get('/start', function(req, res) {
     gol.start();
