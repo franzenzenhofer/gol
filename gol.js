@@ -94,7 +94,7 @@ var wayOfLife = function(cWorld, callback, timeout) {
         }
       }
     }
-    var collisiontest = false;
+    var collisiontest = true;
     if(cWorld[i].alive) {
       var attackerwins = true;
       if(newWorld[i]["ln"]) {
@@ -111,11 +111,19 @@ var wayOfLife = function(cWorld, callback, timeout) {
               newWorld[i].party = undefined
             }
           }else {
-            if(newWorld[i]["ln"][lnparty].length == 3) {
-              if(newWorld[i].alive && attackerwins == false) {
-              }else {
+            if(newWorld[i]["ln"][lnparty].length == 2 || newWorld[i]["ln"][lnparty].length == 3) {
+              if(newWorld[i].alive && newWorld[i].party==cWorld[i].party && attackerwins == true) {
                 newWorld[i].alive = true;
                 newWorld[i].party = lnparty
+              }else if(newWorld[i].alive && newWorld[i].party!=cWorld[i].party && attackerwins == true)
+              {
+                //we have a conflict
+                newWorld[i].alive = true;
+                newWorld[i].party = 'x';
+              }
+              else
+              {
+                //current one wins
               }
             }
           }
@@ -128,8 +136,15 @@ var wayOfLife = function(cWorld, callback, timeout) {
       if(newWorld[i]["ln"]) {
         for(var lnparty in newWorld[i]["ln"]) {
           if(newWorld[i]["ln"][lnparty] && newWorld[i]["ln"][lnparty].length == 3) {
-            newWorld[i].alive = true;
-            newWorld[i].party = lnparty
+            if(newWorld[i].alive==true&&collisiontest==true) //we have a colltision
+            {
+              newWorld[i].alive = true;
+              newWorld[i].party = 'z';
+            }else 
+            {
+              newWorld[i].alive = true;
+              newWorld[i].party = lnparty;
+            }
           }
         }
       }

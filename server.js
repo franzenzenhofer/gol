@@ -1,68 +1,39 @@
-
-var express = require('express');
-var io = require('socket.io');
-var app = express.createServer();
-//var socket = io.listen(app, {'transports':['websocket', 'flashsocket','xhr-multipart', 'xhr-polling', 'jsonp-polling', 'htmlfile' ], 'port':9980});
-var socket = io.listen(app, {'transports':['websocket'], 'port':9980});
-var gol = require('./gol.js');
-var fs = require('fs');
-var util = require('util');
-
-
-app.enable('jsonp callback');
-var wait = 150;
-for(var i = 0; i<process.ARGV.length; i++)
-{
-  var start = false;
-  console.log(process.ARGV[i]);
-  if(process.ARGV[i]=='start'){ start = true; }
-  if(typeof process.ARGV[i] == "number"){ wait = process.ARGV[i]; }
-  //if(start) { gol.start(false,false,wait); }
-}
-
-gol.start(false,false,wait);
-
-app.get('/', function(req, res) {
-    fs.readFile('./index.html', 'utf-8', function (err, data) {
-    if (err) throw err;
-      res.send(data);
-    });
-});
-
-
-
-app.get('/start', function(req, res) {
-    gol.start();
-});
-
-app.get('/debug', function(req, res) {
-           console.log(util.inspect(gol.getStreamlinedWorld(), true, null));
-});
-
-app.get('/jsonp', function(req, res) {
-    res.send(gol.world);
-});
-
-//socket.io
-var activeBroadCast = false;
-socket.on('connection', function(client)
-{
-    client.on('message', function(){
-      //client.broadcast(gol.world);
-      client.broadcast('hiho');
-    });
-    
-    if(!activeBroadCast)
-    {
-     //activeBroadCast=setInterval(function(){client.broadcast(gol.world);console.log('interval');}, wait);
-     activeBroadCast=setInterval(function(){client.broadcast(gol.getStreamlinedWorld());console.log('interval');}, wait);
+var express = require("express"), io = require("socket.io"), app = express.createServer(), socket = io.listen(app, {transports:["websocket"], port:9980}), gol_i = require("./gol.js"), gol = Object.create(gol_i), fs = require("fs"), util = require("util"), wait = 150, nrClients = 0;
+app.get("/", function(a, b) {
+  fs.readFile("./index.html", "utf-8", function(c, d) {
+    if(c) {
+      throw c;
     }
-
+    b.send(d)
+  })
 });
-
-
-
-//jsonp?callback=test
-//test({ foo: 'bar' });
-
-app.listen(3000);
+app.get("/debug", function() {
+  console.log(util.inspect(gol.getStreamlinedWorld(), true, null))
+});
+var activeBroadCast = false;
+socket.on("connection", function(a) {
+  nrClients++;
+  console.log(util.inspect(a));
+  a.on("message", function(b) {
+    console.log(util.inspect(b));
+    if(!activeBroadCast) {
+      gol.start(false, false, wait);
+      activeBroadCast = setInterval(function() {
+        if(nrClients == 1) {
+          a.send(gol.getStreamlinedWorld());
+          console.log("clients: " + nrClients)
+        }else {
+          activeBroadCast = setInterval(function() {
+            a.broadcast(gol.getStreamlinedWorld());
+            console.log("clients: " + nrClients)
+          }, wait)
+        }
+      }, wait)
+    }
+  });
+  a.on("disconnect", function() {
+    console.log("disconnect serverside");
+    nrClients--
+  })
+});
+app.listen(3E3);
