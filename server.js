@@ -23,12 +23,13 @@ var activeBroadCast = false;
 socket.on("connection", function(a) {
   nrClients++;
   console.log(util.inspect(a));
+  a.send('hi');
   a.on("message", function(b) {
     console.log(util.inspect(b));
     if(!activeBroadCast) {
       gol.start(false, false, wait);
       activeBroadCast = setInterval(function() {
-        if(nrClients == 1) {
+        if(false) {
           a.send(gol.getStreamlinedWorld());
           console.log("clients: " + nrClients)
         }else {
