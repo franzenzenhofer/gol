@@ -32,10 +32,8 @@ socket.on("connection", function(a) {
           a.send(gol.getStreamlinedWorld());
           console.log("clients: " + nrClients)
         }else {
-          activeBroadCast = setInterval(function() {
-            a.broadcast(gol.getStreamlinedWorld());
-            console.log("clients: " + nrClients)
-          }, wait)
+          a.broadcast(gol.getStreamlinedWorld());
+          console.log("clients: " + nrClients)
         }
       }, wait)
     }
