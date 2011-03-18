@@ -7,6 +7,15 @@ app.get("/", function(a, b) {
     b.send(d)
   })
 });
+
+app.get("/default.css", function(a, b) {
+  fs.readFile("./default.css", "utf-8", function(c, d) {
+    if(c) {
+      throw c;
+    }
+    b.send(d)
+  })
+});
 app.get("/debug", function() {
   console.log(util.inspect(gol.getStreamlinedWorld(), true, null))
 });

@@ -1,11 +1,7 @@
 <html>
 <head>
-<style>pre {
-  font-family:     "Courier New",
-                    Courier,
-                    monospace;
-}
-     </style>
+<LINK href="default.css" rel="stylesheet" type="text/css">
+<style>  </style>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 <script src="http://cdn.socket.io/stable/socket.io.js"></script> 
 <script>
@@ -19,11 +15,15 @@ var updateGolCanvas = function(d, canvas)
   var world = d.w;
   ctx=canvas.getContext("2d");
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  
+  var r = canvas.height/y;
+  var h = (canvas.height-r)/y;
+  var w = (canvas.width-r)/x;
   var cell = function(cx,cy,nrid,ctx){
     ctx.fillStyle = "#"+colA[nrid-1];
     ctx.beginPath();
-    ctx.arc(cx, cy, 8, 0, Math.PI*2, true); 
+    
+    //var r = 8;
+    ctx.arc(cx, cy, r, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();
   }
@@ -35,7 +35,7 @@ var updateGolCanvas = function(d, canvas)
       wni=(i*x)+j;
       if(world[wni])
       {
-        cell((j+1)*10,(i+1)*10,world[wni],ctx);
+        cell((j+1)*w,(i+1)*h,world[wni],ctx);
       }
 
     }
@@ -49,7 +49,10 @@ var call = function call ()
 };
 
 $(document).ready(function() {
-var socket = new io.Socket('127.0.0.1', {port:3000, 'transports':['websocket' ]}); 
+$('body').append('<canvas id="world" width="'+$(window).width()+'" height="'+$(window).height()+'" style="border:0px solid red;"></canvas>')
+
+//var socket = new io.Socket('127.0.0.1', {port:3000, 'transports':['websocket' ]}); 
+var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket' ]}); 
 
 socket.on('connect', function(){ 
   //alert('connect');
@@ -74,7 +77,7 @@ socket.connect();
 <body>
 <pre id="board" >
 </pre>
-<center><canvas id="world" width="1010px" height="610px" style="border:1px solid black;" ></canvas></center>
+<!--<center><canvas id="world" width="1010px" height="610px" style="border:1px solid black;" ></canvas></center>-->
 
 </body>
 </html>
