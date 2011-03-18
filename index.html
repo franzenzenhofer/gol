@@ -21,12 +21,13 @@ var updateGolCanvas = function(d, canvas)
   var cell = function(cx,cy,nrid,ctx){
     ctx.fillStyle = "#"+colA[nrid-1];
     
-    
+    ctx.beginPath();
     //var r = 8;
     ctx.arc(cx, cy, r, 0, Math.PI*2, true); 
-    
+    ctx.fill();
+    //ctx.closePath();
   }
-  ctx.beginPath();
+  
   for(var i = 0; i<y; i++)
   {
     for(var j = 0; j<x; j++)
@@ -39,8 +40,8 @@ var updateGolCanvas = function(d, canvas)
 
     }
   }
-  ctx.closePath();
-  ctx.fill();
+  
+  
 }
 
 var call = function call ()
