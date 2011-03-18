@@ -1,4 +1,4 @@
-var express = require("express"), io = require("socket.io"), app = express.createServer(), socket = io.listen(app, {transports:["websocket"], port:9980}), gol_i = require("./gol.js"), gol = Object.create(gol_i), fs = require("fs"), util = require("util"), wait = 150, nrClients = 0;
+var express = require("express"), io = require("socket.io"), app = express.createServer(), socket = io.listen(app, {transports:["websocket"], port:9980}), gol_i = require("./gol.js"), gol = Object.create(gol_i), fs = require("fs"), util = require("util"), wait = 175, nrClients = 0;
 app.get("/", function(a, b) {
   fs.readFile("./index.html", "utf-8", function(c, d) {
     if(c) {

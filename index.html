@@ -6,7 +6,7 @@
 <script src="http://cdn.socket.io/stable/socket.io.js"></script> 
 <script>
 
-var colA= ['000000','FF0000','00FF00','0000FF', 'FFFF00', '00FFFF', 'FF00FF', 'FF6600'];
+var colA= ['FF0000','00FF00','0000FF', 'FFFF00', '00FFFF', 'FF00FF', 'FF6600', '000000'];
 var updateGolCanvas = function(d, canvas)
 {
   var y=d.y;
@@ -16,15 +16,24 @@ var updateGolCanvas = function(d, canvas)
   ctx=canvas.getContext("2d");
   ctx.clearRect(0,0,canvas.width,canvas.height);
   var r = canvas.height/y;
-  var h = (canvas.height-r)/y;
-  var w = (canvas.width-r)/x;
+  //var h = (canvas.height-r)/y;
+  var h = (canvas.height)/y;
+  //var w = (canvas.width-r)/x;
+   var w = (canvas.width)/x;
   var cell = function(cx,cy,nrid,ctx){
     ctx.fillStyle = "#"+colA[nrid-1];
+    ctx.fillRect (cx, cy, r, r);
+    ctx.fillStyle = "#000000"
+    ctx.strokeRect(cx, cy, r, r);
+
+   // ctx.strokeStyle = "#FFFFFF";
     
-    ctx.beginPath();
+    
+    //ctx.beginPath();
     //var r = 8;
-    ctx.arc(cx, cy, r, 0, Math.PI*2, true); 
-    ctx.fill();
+    //ctx.arc(cx, cy, r, 0, Math.PI*2, true); 
+   // ctx.fill();
+    //ctx.stroke();
     //ctx.closePath();
   }
   
@@ -35,7 +44,8 @@ var updateGolCanvas = function(d, canvas)
       wni=(i*x)+j;
       if(world[wni])
       {
-        cell((j+1)*w,(i+1)*h,world[wni],ctx);
+        //cell((j+1)*w,(i+1)*h,world[wni],ctx);
+        cell((j)*w,(i)*h,world[wni],ctx);
       }
 
     }
