@@ -22,9 +22,9 @@ var updateGolCanvas = function(d, canvas)
    var w = (canvas.width)/x;
   var cell = function(cx,cy,nrid,ctx){
     ctx.fillStyle = "#"+colA[nrid-1];
-    ctx.fillRect (cx, cy, r, r);
+    ctx.fillRect (cx, cy, w, h);
     ctx.fillStyle = "#000000"
-    ctx.strokeRect(cx, cy, r, r);
+    ctx.strokeRect(cx, cy, w, h);
 
    // ctx.strokeStyle = "#FFFFFF";
     
