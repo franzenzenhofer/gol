@@ -52,4 +52,4 @@ socket.on("connection", function(a) {
     nrClients--
   })
 });
-app.listen(3E3);
+app.listen(3001);

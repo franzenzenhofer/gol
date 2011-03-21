@@ -15,6 +15,10 @@ var defaultParty = "a";
 var generation = 0;
 var partyO = {};
 var forceQueue = [];
+//var Worker = require('webworker').Worker;
+//var worker = new Worker("golworker.js");
+
+
 
 var createCell = function(_alive, _party) {
   var party = undefined;
@@ -69,10 +73,6 @@ var publicWorld = getAWorld(x, y);
 var wayOfLife = function(cWorld, callback, timeout) {
   
   var newWorld = getAWorld(x, y);
-  for(var i = 0;i < cWorld.length;i++) {
-    if(cWorld[i]) {
-    }
-  }
   for(var i = 0;i < cWorld.length;i++) {
     for(var k = -1;k <= 1;k++) {
       for(var j = 1;j >= -1;j--) {
