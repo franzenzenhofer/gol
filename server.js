@@ -15,20 +15,26 @@ socket.on("connection", function(a) {
   nrClients++;
   console.log(util.inspect(a));
   a.on("message", function(b) {
-    console.log(util.inspect(b));
+   // console.log(util.inspect(b));
     if(!activeBroadCast) {
       gol.start(false, false, wait);
       activeBroadCast = setInterval(function() {
         if(nrClients == 1) {
           a.send(gol.getStreamlinedWorld());
-          console.log("clients: " + nrClients)
+          //console.log("clients: " + nrClients)
         }else {
           activeBroadCast = setInterval(function() {
             a.broadcast(gol.getStreamlinedWorld());
-            console.log("clients: " + nrClients)
+            //console.log("clients: " + nrClients)
           }, wait)
         }
       }, wait)
+    }
+    
+    if(b.x&&b.y&&b.id)
+    {
+       console.log(util.inspect(b));
+       gol.force(b);
     }
   });
   a.on("disconnect", function() {
