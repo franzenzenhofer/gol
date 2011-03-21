@@ -41,7 +41,7 @@ socket.on("connection", function(a) {
       }, wait)
     }
     
-    if(b.x&&b.y&&b.id)
+    if(b.x!=undefined&&b.y!=undefined&&b.id!=undefined)
     {
        console.log(util.inspect(b));
        gol.force(b);

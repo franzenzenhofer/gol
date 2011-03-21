@@ -9,6 +9,7 @@
 <script>
 
 var colA= ['FF0000','00FF00','0000FF', 'FFFF00', '00FFFF', 'FF00FF', 'FF6600', '000000'];
+var cW, cH;
 var updateGolCanvas = function(d, canvas)
 {
   var y=d.y;
@@ -17,11 +18,11 @@ var updateGolCanvas = function(d, canvas)
   var world = d.w;
   ctx=canvas.getContext("2d");
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  var r = canvas.height/y;
+  //var r = canvas.height/y;
   //var h = (canvas.height-r)/y;
-  var h = (canvas.height)/y;
+  var h = (canvas.height)/y; cH=h;
   //var w = (canvas.width-r)/x;
-   var w = (canvas.width)/x;
+   var w = (canvas.width)/x; cW=w;
   var cell = function(cx,cy,nrid,ctx){
     ctx.fillStyle = "#"+colA[nrid-1];
     ctx.fillRect (cx, cy, w, h);
@@ -66,8 +67,8 @@ $(document).ready(function() {
 
 $('body').append('<canvas id="world" width="'+$(window).width()+'" height="'+$(window).height()+'" style="border:0px solid red;"></canvas>')
 
-//var socket = new io.Socket('127.0.0.1', {port:3000, 'transports':['websocket' ]}); 
-var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket' ]}); 
+var socket = new io.Socket('127.0.0.1', {port:3000, 'transports':['websocket' ]}); 
+//var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket' ]}); 
 
 
 socket.on('connect', function(){ 
@@ -97,10 +98,10 @@ function getCursorPosition(e, gCanvasElement) {
     }
     x -= gCanvasElement.offsetLeft;
     y -= gCanvasElement.offsetTop;
-    x = Math.min(x, gCanvasElement.width * 10);
-    y = Math.min(y, gCanvasElement.height* 10);
+    x = Math.min(x, gCanvasElement.width * cW);
+    y = Math.min(y, gCanvasElement.height* cH);
     
-    var r = {'x':Math.floor(x/10), 'y':Math.floor(y/10)}
+    var r = {'x':Math.floor(x/cW), 'y':Math.floor(y/cH)}
     //alert('x'+r.x+'y'+r.y);
     return r;
 }
@@ -121,13 +122,7 @@ $('#world').click(function(e){
 
 </head>
 <body>
-<<<<<<< HEAD
-<pre id="board" >
-</pre>
-<!--<center><canvas id="world" width="1010px" height="610px" style="border:1px solid black;" ></canvas></center>-->
-=======
 
->>>>>>> activeactions
 
 </body>
 </html>

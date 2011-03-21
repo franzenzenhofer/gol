@@ -158,9 +158,9 @@ var wayOfLife = function(cWorld, callback, timeout) {
   while(c = forceQueue.pop())
   {
     var posi = c.y*x+c.x;
-    console.log(posi);
+    console.log('change'+posi);
     newWorld[posi].alive = true;
-    newWorld[posi].party = 'a';
+    newWorld[posi].party = 'z';
   }
   generation++;
   for(var i = 0;i < newWorld.length;i++) {
