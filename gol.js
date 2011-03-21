@@ -14,6 +14,7 @@ var worldsize = x * y;
 var defaultParty = "a";
 var generation = 0;
 var partyO = {};
+var forceQueue = [];
 
 var createCell = function(_alive, _party) {
   var party = undefined;
@@ -66,6 +67,7 @@ var getAWorld = function(x, y, seed) {
 var world = getAWorld(x, y, {"a":worldsize / 5, "b":worldsize / 5, "c":worldsize / 5, "d":worldsize / 5, "e":worldsize / 5, "f":worldsize / 5, "g":worldsize / 5});
 var publicWorld = getAWorld(x, y);
 var wayOfLife = function(cWorld, callback, timeout) {
+  
   var newWorld = getAWorld(x, y);
   for(var i = 0;i < cWorld.length;i++) {
     if(cWorld[i]) {
@@ -111,7 +113,7 @@ var wayOfLife = function(cWorld, callback, timeout) {
               newWorld[i].party = undefined
             }
           }else {
-            if(newWorld[i]["ln"][lnparty].length == 2 || newWorld[i]["ln"][lnparty].length == 3) {
+            if(newWorld[i]["ln"][lnparty].length == 3) {
               if(newWorld[i].alive && newWorld[i].party==cWorld[i].party && attackerwins == true) {
                 newWorld[i].alive = true;
                 newWorld[i].party = lnparty
@@ -149,6 +151,16 @@ var wayOfLife = function(cWorld, callback, timeout) {
         }
       }
     }
+  }
+  
+  //we pull in external cells
+  var c;
+  while(c = forceQueue.pop())
+  {
+    var posi = c.y*x+c.x;
+    console.log(posi);
+    newWorld[posi].alive = true;
+    newWorld[posi].party = 'a';
   }
   generation++;
   for(var i = 0;i < newWorld.length;i++) {
@@ -205,3 +217,8 @@ exports.getStreamlinedWorld = function() {
   }
   return{x:x, y:y, g:generation, t:wait, w:streamlinedWorld}
 };
+
+exports.force = function(c)
+{
+  forceQueue.push(c);
+}
