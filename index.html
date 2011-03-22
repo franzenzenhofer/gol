@@ -7,13 +7,14 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 <script src="http://cdn.socket.io/stable/socket.io.js"></script> 
 <script>
-
+"use strict"
 var colA= ['FF0000','00FF00','0000FF', 'FFFF00', '00FFFF', 'FF00FF', 'FF6600', '000000'];
 var cW, cH;
 var latestCursorPostion;
-var selectionA;
+var selectionA=[];
 var selectionStart=false;
-
+var canvas, ctx;
+var maxSizeSelection=12;
 var updateGolCanvas = function(d, canvas)
 {
   var y=d.y;
@@ -36,9 +37,9 @@ var updateGolCanvas = function(d, canvas)
   
   }
   
-  if(latestCursorPostion)
+  if(selectionA)
   {
-    drawSelection(latestCursorPostion, canvas);
+    drawSelection(selectionA);
   }
   
   for(var i = 0; i<y; i++)
@@ -58,27 +59,35 @@ var updateGolCanvas = function(d, canvas)
   
 }
 
-var drawSelection = function(a, canvas)
+var drawSelection = function(A)
 {
-  ctx=canvas.getContext("2d");
-  if(selectionStart==true)
-  {
-    ctx.fillStyle = "#848484";
+  //ctx=canvas.getContext("2d")
+  for(var i = 0; i<A.length;i++)
+  { 
+    var a = A[i];
+    if(selectionStart==true)
+    {
+      ctx.fillStyle = "#848484";
+      ctx.strokeRect((a.x)*cW, (a.y)*cH, cW, cH);
+      ctx.fillRect((a.x)*cW, (a.y)*cH, cW, cH);
     //alert('test');
+    }
+    else
+    {
+      ctx.fillStyle = "#F2F2F2";
+      ctx.strokeRect((a.x)*cW, (a.y)*cH, cW, cH);
+    }
   }
-  else
-  {
-    ctx.fillStyle = "#F2F2F2";
-  }
-  ctx.strokeRect((a.x)*cW, (a.y)*cH, cW, cH);
-  ctx.fillRect((a.x)*cW, (a.y)*cH, cW, cH);
+  return this;
+ 
 }
 
 
 $(document).ready(function() {
 
 $('body').append('<canvas id="world" width="'+$(window).width()+'" height="'+$(window).height()+'" style="border:0px solid red;"></canvas>')
-
+canvas = document.getElementById('world');
+ctx = canvas.getContext("2d");
 var socket = new io.Socket('127.0.0.1', {port:3001, 'transports':['websocket' ]}); 
 //var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket' ]}); 
 
@@ -119,9 +128,9 @@ function getCursorPosition(e, gCanvasElement) {
 }
 
 $('#world').click(function(e){
- var a = getCursorPosition(e, this);
- a.id='a';
- socket.send(a);
+ //var a = getCursorPosition(e, this);
+ //a.id='a';
+ //socket.send(a);
  
  if(selectionStart==false)
  {
@@ -130,15 +139,63 @@ $('#world').click(function(e){
  }
  else
  {
+  //send the selection to the server
+  socket.send({'type':'selectionA', 'id':'a', 'selectionA':selectionA});
   selectionStart=false;
+  selectionA.length=0;
  }
  
   });
 
+var postionInArray = function(a,selA)
+{
+   for(var j = 0; j<selA.length; j++)
+   {
+        if(a.x==selA[j].x&&a.y==selA[j].y)
+        {
+          return j;
+        }
+   }
+   return -1;
+}
+
 
 $('#world').mousemove(function(e){
  latestCursorPostion = getCursorPosition(e, this);
- drawSelection(latestCursorPostion, this);
+ if(selectionStart==true)
+ {
+       //if the selection matches an element that is allready in the array
+      var pos = postionInArray(latestCursorPostion, selectionA);
+       //alert(pos+'!=-1&&'+pos+'!=('+selectionA.length-1+'))');
+      // alert(selectionA.length);
+  //if(pos!=-1&&pos!=(selectionA.length-1))
+  
+  if((pos!=-1&&pos!=(selectionA.length-1))||selectionA.length>maxSizeSelection)
+  {
+ // alert('hi'+pos);
+    //alert('hi'+pos);
+    //send selection
+    socket.send({'type':'selectionA', 'id':'a', 'selectionA':selectionA});
+    //set seleciton to false
+    selectionStart=false;
+    selectionA.length=0;
+  }
+  else
+  {
+    if(pos!=(selectionA.length-1))
+    {
+      selectionA.push(latestCursorPostion);
+    }
+  }
+  
+ 
+ }
+ else
+ {
+  selectionA.length=0;
+  selectionA.push(latestCursorPostion);
+ }
+ drawSelection([selectionA[0]], this);
   
     //ctx.strokeRect(latestCursorPostion.x*cW, latestCursorPostion.y*cH, cW, cH);
   });

@@ -1,4 +1,6 @@
 var express = require("express"), io = require("socket.io"), app = express.createServer(), socket = io.listen(app, {transports:["websocket"], port:9980}), gol_i = require("./gol.js"), gol = Object.create(gol_i), fs = require("fs"), util = require("util"), wait = 300, nrClients = 0;
+
+
 app.get("/", function(a, b) {
   fs.readFile("./index.html", "utf-8", function(c, d) {
     if(c) {
@@ -40,11 +42,19 @@ socket.on("connection", function(a) {
         }
       }, wait)
     }
-    
-    if(b.x!=undefined&&b.y!=undefined&&b.id!=undefined)
+    console.log(util.inspect(b));
+    console.log(typeof b);
+    //if(isArray(b)&&)
+    if(b.type=='selectionA'&&b.id)
     {
-       console.log(util.inspect(b));
-       gol.force(b);
+      for(var k = 0; k<b.selectionA.length; k++)
+      {
+        if(b.selectionA[k].x!=undefined&&b.selectionA[k].y!=undefined)
+        {
+          console.log(util.inspect(b[k]));
+          gol.force(b.selectionA[k], b.id);
+        }
+      }
     }
   });
   a.on("disconnect", function() {

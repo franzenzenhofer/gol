@@ -218,7 +218,8 @@ exports.getStreamlinedWorld = function() {
   return{x:x, y:y, g:generation, t:wait, w:streamlinedWorld}
 };
 
-exports.force = function(c)
+exports.force = function(c, id)
 {
+  c.id=id;
   forceQueue.push(c);
 }
