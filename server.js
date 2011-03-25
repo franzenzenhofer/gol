@@ -22,8 +22,10 @@ app.get("/debug", function() {
   console.log(util.inspect(gol.getStreamlinedWorld(), true, null))
 });
 var activeBroadCast = false;
+var clientsA = [];
 socket.on("connection", function(a) {
   nrClients++;
+  clientsA.push(a);
   console.log(util.inspect(a));
   a.send('hi');
   a.on("message", function(b) {
@@ -31,7 +33,7 @@ socket.on("connection", function(a) {
     if(!activeBroadCast) {
       gol.start(false, false, wait);
       activeBroadCast = setInterval(function() {
-        if(false) {
+        if(clientsA.length==1) {
           a.send(gol.getStreamlinedWorld());
           //console.log("clients: " + nrClients)
         }else {

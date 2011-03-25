@@ -11,7 +11,7 @@
 var colA = ["FF0000", "00FF00", "0000FF", "FFFF00", "00FFFF", "FF00FF", "FF6600", "000000"], cW, cH, latestCursorPostion, selectionA = [], selectionStart = !1, canvas, ctx, maxSizeSelection = 12;
 var updateGolCanvas = function(c, b) {
   var a = c.y, f = c.x;
-  timeout = c.t;
+  var timeout = c.t;
   var g = c.w;
   ctx = b.getContext("2d");
   ctx.clearRect(0, 0, b.width, b.height);
@@ -20,13 +20,14 @@ var updateGolCanvas = function(c, b) {
   var h = function(a, b, c, d) {
     d.fillStyle = "#" + colA[c - 1];
     d.fillRect(a, b, cW, cH);
-    d.fillStyle = "#FF0000";
     d.strokeRect(a, b, cW, cH)
   };
+ 
   selectionA && drawSelection(selectionA);
   for(var d = 0;d < a;d++) {
     for(var e = 0;e < f;e++) {
-      wni = d * f + e, g[wni] && h(e * cW, d * cH, g[wni], ctx)
+      var wni = d * f + e;
+      if(g[wni]) { h(e * cW, d * cH, g[wni], ctx); }
     }
   }
 };
@@ -34,7 +35,17 @@ var updateGolCanvas = function(c, b) {
 var drawSelection = function(c) {
   for(var b = 0;b < c.length;b++) {
     var a = c[b];
-    selectionStart == !0 ? (ctx.fillStyle = "#848484", ctx.strokeRect(a.x * cW, a.y * cH, cW, cH), ctx.fillRect(a.x * cW, a.y * cH, cW, cH)) : (ctx.fillStyle = "#F2F2F2", ctx.strokeRect(a.x * cW, a.y * cH, cW, cH))
+    if(a)
+    {
+      if(selectionStart == !0)
+      {
+        (ctx.fillStyle = "#848484", ctx.strokeRect(a.x * cW, a.y * cH, cW, cH), ctx.fillRect(a.x * cW, a.y * cH, cW, cH))
+      }
+      else
+      {
+        (ctx.fillStyle = "#F2F2F2", ctx.strokeRect(a.x * cW, a.y * cH, cW, cH))
+      }
+    }
   }
   return this
 };
@@ -45,39 +56,78 @@ $(document).ready(function() {
   ctx = canvas.getContext("2d");
   var c = new io.Socket("127.0.0.1", {port:3001, transports:["websocket"]});
   //var c = new io.Socket("gameoflife.duostack.net", {port:9980, transports:["websocket"]});
+  
+  var sendSelection = function(server, is, selectionA)
+      {
+        server.send({type:"selectionA", id:1, selectionA:selectionA});
+      }
+      
   c.on("connect", function() {
     c.send("start")
   });
   c.on("message", function(b) {
-    console.log(b);
+   // console.log(b);
     updateGolCanvas(b, document.getElementById("world"))
   });
   c.on("disconnect", function() {
   });
   c.connect();
   $("#world").click(function() {
-    selectionStart == !1 ? selectionStart = !0 : (c.send({type:"selectionA", id:"a", selectionA:selectionA}), selectionStart = !1, selectionA.length = 0)
+    if(selectionStart == false)
+    {
+      selectionStart = true;
+    }
+    else
+    {
+      
+      sendSelection(c,1,selectionA);
+      selectionStart = false;
+      selectionA=[];
+      //selectionA.length = 0;
+    }
   });
   $("#world").mousemove(function(b) {
-    var a;
-    b.pageX != void 0 && b.pageY != void 0 ? (a = b.pageX, b = b.pageY) : (a = b.clientX + document.body.scrollLeft + document.documentElement.scrollLeft, b = b.clientY + document.body.scrollTop + document.documentElement.scrollTop);
-    a -= this.offsetLeft;
-    b -= this.offsetTop;
-    a = Math.min(a, this.width * cW);
-    b = Math.min(b, this.height * cH);
-    latestCursorPostion = {x:Math.floor(a / cW), y:Math.floor(b / cH)};
-    if(selectionStart == !0) {
-      a: {
-        for(a = 0;a < selectionA.length;a++) {
-          if(latestCursorPostion.x == selectionA[a].x && latestCursorPostion.y == selectionA[a].y) {
-            break a
+    function getCursorPostion(e)
+    {
+      //console.log(e);
+      var a;
+      e.pageX != void 0 && e.pageY != void 0 ? (a = e.pageX, b = e.pageY) : (a = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft, b = e.clientY + document.body.scrollTop + document.documentElement.scrollTop);
+      a -= this.offsetLeft;
+      b -= this.offsetTop;
+      a = Math.min(a, this.width * cW);
+      b = Math.min(b, this.height * cH);
+      return {x:Math.floor(a / cW), y:Math.floor(b / cH)};
+    }
+    function positionInArray(pos, selectionA)
+    {
+      for(a = 0;a < selectionA.length;a++) {
+          if(pos.x == selectionA[a].x && pos.y == selectionA[a].y) {
+            return a
           }
         }
-        a = -1
-      }
-      a != -1 && a != selectionA.length - 1 || selectionA.length > maxSizeSelection ? (c.send({type:"selectionA", id:"a", selectionA:selectionA}), selectionStart = !1, selectionA.length = 0) : a != selectionA.length - 1 && selectionA.push(latestCursorPostion)
+        return -1
+    }
+    latestCursorPostion = getCursorPostion.apply(this,[b]);
+    if(selectionStart == true) {
+      var a = positionInArray(latestCursorPostion, selectionA);
+      if((a != -1 && a != (selectionA.length - 1)) || (selectionA.length > maxSizeSelection)) 
+      {
+       //c.send({type:"selectionA", id:1, selectionA:selectionA});
+       sendSelection(c,1,selectionA);
+       selectionStart = !1, selectionA=[];
+       }
+       else
+       {  
+          if(a != selectionA.length - 1 )
+          {
+            selectionA.push(latestCursorPostion);
+          }
+        }
     }else {
-      selectionA.length = 0, selectionA.push(latestCursorPostion)
+      //alert(latestCursorPostion);
+      selectionA=[];
+      selectionA.push(latestCursorPostion);
+      console.log(selectionA);
     }
     drawSelection([selectionA[0]], this)
   })
