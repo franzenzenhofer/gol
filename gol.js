@@ -11,7 +11,7 @@ var wait = 150;
 var x = 50;
 var y = 30;
 var worldsize = x * y;
-var defaultParty = "a";
+var defaultParty = 0;
 var generation = 0;
 var partyO = {};
 var forceQueue = [];
@@ -51,14 +51,14 @@ var getAWorld = function(x, y, seed) {
       }
     }
   }else {
-    if(seed && typeof seed == "object") {
-      for(var party in seed) {
-        seednr = Math.floor(seed[party]);
+    if(seed && Array.isArray(seed)) {
+      for(var k = 0; k<seed.length; k++) {
+        seednr = Math.floor(seed[k]);
         for(var i = 0;i < seednr;i++) {
           r = Math.floor(Math.random() * wsize);
           if(w[r].alive === false) {
             w[r].alive = true;
-            w[r].party = party
+            w[r].party = k
           }else {
             //i--
           }
@@ -68,7 +68,7 @@ var getAWorld = function(x, y, seed) {
   }
   return w
 };
-var world = getAWorld(x, y, {"a":worldsize / 5, "b":worldsize / 5, "c":worldsize / 5, "d":worldsize / 5, "e":worldsize / 5, "f":worldsize / 5, "g":worldsize / 5});
+var world = getAWorld(x, y, [worldsize / 5, worldsize / 5, worldsize / 5, worldsize / 5, worldsize / 5, worldsize / 5, worldsize / 5]);
 var publicWorld = getAWorld(x, y);
 var wayOfLife = function(cWorld, callback, timeout) {
   
@@ -160,7 +160,7 @@ var wayOfLife = function(cWorld, callback, timeout) {
     var posi = c.y*x+c.x;
     console.log('change'+posi);
     newWorld[posi].alive = true;
-    newWorld[posi].party = 'z';
+    newWorld[posi].party = c.id;
   }
   generation++;
   for(var i = 0;i < newWorld.length;i++) {
@@ -215,11 +215,12 @@ exports.getStreamlinedWorld = function() {
       }
     }
   }
-  return{x:x, y:y, g:generation, t:wait, w:streamlinedWorld}
+  return{x:x, y:y, g:generation, t:wait, w:streamlinedWorld, p:partyO}
 };
 
 exports.force = function(c, id)
 {
   c.id=id;
+  console.log(c);
   forceQueue.push(c);
 }

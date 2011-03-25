@@ -8,203 +8,80 @@
 <script src="http://cdn.socket.io/stable/socket.io.js"></script> 
 <script>
 "use strict"
-var colA= ['FF0000','00FF00','0000FF', 'FFFF00', '00FFFF', 'FF00FF', 'FF6600', '000000'];
-var cW, cH;
-var latestCursorPostion;
-var selectionA=[];
-var selectionStart=false;
-var canvas, ctx;
-var maxSizeSelection=12;
-var updateGolCanvas = function(d, canvas)
-{
-  var y=d.y;
-  var x=d.x;
-  timeout = d.t;
-  var world = d.w;
-  ctx=canvas.getContext("2d");
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  //var r = canvas.height/y;
-  //var h = (canvas.height-r)/y;
-  var h = (canvas.height)/y; cH=h;
-  //var w = (canvas.width-r)/x;
-   var w = (canvas.width)/x; cW=w;
-  var cell = function(cx,cy,nrid,ctx){
-    ctx.fillStyle = "#"+colA[nrid-1];
-    ctx.fillRect (cx, cy, w, h);
-    ctx.fillStyle = "#FF0000";
- //   ctx.fillStyle = "#FF0000";
-    ctx.strokeRect(cx, cy, w, h);
-  
-  }
-  
-  if(selectionA)
-  {
-    drawSelection(selectionA);
-  }
-  
-  for(var i = 0; i<y; i++)
-  {
-    for(var j = 0; j<x; j++)
-    {
-      wni=(i*x)+j;
-      if(world[wni])
-      {
-        //cell((j+1)*w,(i+1)*h,world[wni],ctx);
-        cell((j)*w,(i)*h,world[wni],ctx);
-      }
-
+var colA = ["FF0000", "00FF00", "0000FF", "FFFF00", "00FFFF", "FF00FF", "FF6600", "000000"], cW, cH, latestCursorPostion, selectionA = [], selectionStart = !1, canvas, ctx, maxSizeSelection = 12;
+var updateGolCanvas = function(c, b) {
+  var a = c.y, f = c.x;
+  timeout = c.t;
+  var g = c.w;
+  ctx = b.getContext("2d");
+  ctx.clearRect(0, 0, b.width, b.height);
+  cH = b.height / a;
+  cW = b.width / f;
+  var h = function(a, b, c, d) {
+    d.fillStyle = "#" + colA[c - 1];
+    d.fillRect(a, b, cW, cH);
+    d.fillStyle = "#FF0000";
+    d.strokeRect(a, b, cW, cH)
+  };
+  selectionA && drawSelection(selectionA);
+  for(var d = 0;d < a;d++) {
+    for(var e = 0;e < f;e++) {
+      wni = d * f + e, g[wni] && h(e * cW, d * cH, g[wni], ctx)
     }
   }
-  
-  
-}
+};
 
-var drawSelection = function(A)
-{
-  //ctx=canvas.getContext("2d")
-  for(var i = 0; i<A.length;i++)
-  { 
-    var a = A[i];
-    if(selectionStart==true)
-    {
-      ctx.fillStyle = "#848484";
-      ctx.strokeRect((a.x)*cW, (a.y)*cH, cW, cH);
-      ctx.fillRect((a.x)*cW, (a.y)*cH, cW, cH);
-    //alert('test');
-    }
-    else
-    {
-      ctx.fillStyle = "#F2F2F2";
-      ctx.strokeRect((a.x)*cW, (a.y)*cH, cW, cH);
-    }
+var drawSelection = function(c) {
+  for(var b = 0;b < c.length;b++) {
+    var a = c[b];
+    selectionStart == !0 ? (ctx.fillStyle = "#848484", ctx.strokeRect(a.x * cW, a.y * cH, cW, cH), ctx.fillRect(a.x * cW, a.y * cH, cW, cH)) : (ctx.fillStyle = "#F2F2F2", ctx.strokeRect(a.x * cW, a.y * cH, cW, cH))
   }
-  return this;
- 
-}
-
+  return this
+};
 
 $(document).ready(function() {
-
-$('body').append('<canvas id="world" width="'+$(window).width()+'" height="'+$(window).height()+'" style="border:0px solid red;"></canvas>')
-canvas = document.getElementById('world');
-ctx = canvas.getContext("2d");
-var socket = new io.Socket('127.0.0.1', {port:3001, 'transports':['websocket' ]}); 
-//var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket' ]}); 
-
-
-socket.on('connect', function(){ 
-  //alert('connect');
-  socket.send('start'); 
-});
-socket.on('message', function(data){ 
-  //alert('data '+data);
-  updateGolCanvas(data, document.getElementById('world'));
-});
-socket.on('disconnect', function(){
-  // alert('disconnect');
-}); 
-socket.connect();
-
-function getCursorPosition(e, gCanvasElement) {
-    /* returns Cell with .row and .column properties */
-    var x;
-    var y;
-    if (e.pageX != undefined && e.pageY != undefined) {
-	x = e.pageX;
-	y = e.pageY;
-    }
-    else {
-	x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-	y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-    }
-    x -= gCanvasElement.offsetLeft;
-    y -= gCanvasElement.offsetTop;
-    x = Math.min(x, gCanvasElement.width * cW);
-    y = Math.min(y, gCanvasElement.height* cH);
-    
-    var r = {'x':Math.floor(x/cW), 'y':Math.floor(y/cH)}
-    //alert('x'+r.x+'y'+r.y);
-    return r;
-}
-
-$('#world').click(function(e){
- //var a = getCursorPosition(e, this);
- //a.id='a';
- //socket.send(a);
- 
- if(selectionStart==false)
- {
-  selectionStart=true;
-  //alert(selectionStart);
- }
- else
- {
-  //send the selection to the server
-  socket.send({'type':'selectionA', 'id':'a', 'selectionA':selectionA});
-  selectionStart=false;
-  selectionA.length=0;
- }
- 
+  $("body").append('<canvas id="world" width="' + $(window).width() + '" height="' + $(window).height() + '" style="border:0px solid red;"></canvas>');
+  canvas = document.getElementById("world");
+  ctx = canvas.getContext("2d");
+  var c = new io.Socket("127.0.0.1", {port:3001, transports:["websocket"]});
+  //var c = new io.Socket("gameoflife.duostack.net", {port:9980, transports:["websocket"]});
+  c.on("connect", function() {
+    c.send("start")
   });
-
-var postionInArray = function(a,selA)
-{
-   for(var j = 0; j<selA.length; j++)
-   {
-        if(a.x==selA[j].x&&a.y==selA[j].y)
-        {
-          return j;
+  c.on("message", function(b) {
+    console.log(b);
+    updateGolCanvas(b, document.getElementById("world"))
+  });
+  c.on("disconnect", function() {
+  });
+  c.connect();
+  $("#world").click(function() {
+    selectionStart == !1 ? selectionStart = !0 : (c.send({type:"selectionA", id:"a", selectionA:selectionA}), selectionStart = !1, selectionA.length = 0)
+  });
+  $("#world").mousemove(function(b) {
+    var a;
+    b.pageX != void 0 && b.pageY != void 0 ? (a = b.pageX, b = b.pageY) : (a = b.clientX + document.body.scrollLeft + document.documentElement.scrollLeft, b = b.clientY + document.body.scrollTop + document.documentElement.scrollTop);
+    a -= this.offsetLeft;
+    b -= this.offsetTop;
+    a = Math.min(a, this.width * cW);
+    b = Math.min(b, this.height * cH);
+    latestCursorPostion = {x:Math.floor(a / cW), y:Math.floor(b / cH)};
+    if(selectionStart == !0) {
+      a: {
+        for(a = 0;a < selectionA.length;a++) {
+          if(latestCursorPostion.x == selectionA[a].x && latestCursorPostion.y == selectionA[a].y) {
+            break a
+          }
         }
-   }
-   return -1;
-}
-
-
-$('#world').mousemove(function(e){
- latestCursorPostion = getCursorPosition(e, this);
- if(selectionStart==true)
- {
-       //if the selection matches an element that is allready in the array
-      var pos = postionInArray(latestCursorPostion, selectionA);
-       //alert(pos+'!=-1&&'+pos+'!=('+selectionA.length-1+'))');
-      // alert(selectionA.length);
-  //if(pos!=-1&&pos!=(selectionA.length-1))
-  
-  if((pos!=-1&&pos!=(selectionA.length-1))||selectionA.length>maxSizeSelection)
-  {
- // alert('hi'+pos);
-    //alert('hi'+pos);
-    //send selection
-    socket.send({'type':'selectionA', 'id':'a', 'selectionA':selectionA});
-    //set seleciton to false
-    selectionStart=false;
-    selectionA.length=0;
-  }
-  else
-  {
-    if(pos!=(selectionA.length-1))
-    {
-      selectionA.push(latestCursorPostion);
+        a = -1
+      }
+      a != -1 && a != selectionA.length - 1 || selectionA.length > maxSizeSelection ? (c.send({type:"selectionA", id:"a", selectionA:selectionA}), selectionStart = !1, selectionA.length = 0) : a != selectionA.length - 1 && selectionA.push(latestCursorPostion)
+    }else {
+      selectionA.length = 0, selectionA.push(latestCursorPostion)
     }
-  }
-  
- 
- }
- else
- {
-  selectionA.length=0;
-  selectionA.push(latestCursorPostion);
- }
- drawSelection([selectionA[0]], this);
-  
-    //ctx.strokeRect(latestCursorPostion.x*cW, latestCursorPostion.y*cH, cW, cH);
-  });
-
+    drawSelection([selectionA[0]], this)
+  })
 });
-//var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket', 'flashsocket','xhr-multipart', 'xhr-polling', 'jsonp-polling', 'htmlfile' ]}); 
-//var socket = new io.Socket('gameoflife.duostack.net', {port:9980, 'transports':['websocket' ]}); 
-
-
 </script>
 
 </head>
