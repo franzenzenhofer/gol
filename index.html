@@ -54,8 +54,8 @@ $(document).ready(function() {
   $("body").append('<canvas id="world" width="' + $(window).width() + '" height="' + $(window).height() + '" style="border:0px solid red;"></canvas>');
   canvas = document.getElementById("world");
   ctx = canvas.getContext("2d");
-  var c = new io.Socket("127.0.0.1", {port:3001, transports:["websocket"]});
-  //var c = new io.Socket("gameoflife.duostack.net", {port:9980, transports:["websocket"]});
+  //var c = new io.Socket("127.0.0.1", {port:3001, transports:["websocket"]});
+  var c = new io.Socket("gameoflife.duostack.net", {port:9980, transports:["websocket"]});
   
   var sendSelection = function(server, is, selectionA)
       {
